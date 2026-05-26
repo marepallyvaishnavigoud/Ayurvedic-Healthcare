@@ -18,7 +18,7 @@ const MyAppointments = () => {
       .finally(() => setLoading(false))
   }
 
-  useEffect(() => { fetchAppointments() }, [])
+  useEffect(() => { fetchAppointments() }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const cancel = async (id) => {
     if (!window.confirm('Cancel this appointment?')) return

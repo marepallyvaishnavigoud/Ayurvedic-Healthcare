@@ -38,6 +38,7 @@ const TreatmentDetails = () => {
       .then(r => setTreatment(r.data))
       .catch(() => toast.error('Treatment not found'))
       .finally(() => setLoading(false))
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id])
 
   const handle = e => setForm({ ...form, [e.target.name]: e.target.value })

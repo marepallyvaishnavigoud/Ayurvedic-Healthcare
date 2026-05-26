@@ -110,6 +110,7 @@ const Medicines = () => {
       .then(r => { setMedicines(r.data); setFiltered(r.data) })
       .catch(() => {})
       .finally(() => setLoading(false))
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {

@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { useCart } from '../context/CartContext'
 import toast from 'react-hot-toast'
 
 function Card({ children, className = '' }) {
@@ -41,8 +40,6 @@ function ListCard({ title, items }) {
 }
 
 function DetailView({ record, onBack }) {
-  const navigate = useNavigate()
-  const { addToCart } = useCart()
   const ai = record.aiResponse || {}
 
   return (
@@ -161,7 +158,8 @@ export default function AIAnalysisHistory() {
       .then(r => setHistory(r.data))
       .catch(() => toast.error('Failed to load history'))
       .finally(() => setLoading(false))
-  }, []) // eslint-disable-line
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   if (loading) {
     return (

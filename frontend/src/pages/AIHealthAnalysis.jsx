@@ -41,6 +41,7 @@ const treatmentImages = {
   'Raktamokshana': '/treatments/raktamokshana.jpg',
 }
 
+// eslint-disable-next-line no-unused-vars
 function getTreatmentImg(t) {
   return treatmentImages[t.name] || t.img || t.image || t.thumbnail || ''
 }

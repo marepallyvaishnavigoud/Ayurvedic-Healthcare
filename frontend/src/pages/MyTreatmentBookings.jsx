@@ -18,7 +18,7 @@ const MyTreatmentBookings = () => {
       .finally(() => setLoading(false))
   }
 
-  useEffect(() => { fetchBookings() }, [])
+  useEffect(() => { fetchBookings() }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const cancel = async (id) => {
     if (!window.confirm('Cancel this booking?')) return

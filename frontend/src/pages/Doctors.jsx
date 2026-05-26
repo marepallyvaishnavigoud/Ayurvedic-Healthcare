@@ -7,7 +7,7 @@ function AnimatedCard({ doc, index }) {
   const ref = useRef(null)
   const [visible, setVisible] = useState(false)
   const navigate = useNavigate()
-  const { user } = useAuth()
+  const { user } = useAuth() // eslint-disable-line no-unused-vars
 
   useEffect(() => {
     const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) setVisible(true) }, { threshold: 0.1 })
@@ -64,6 +64,7 @@ const Doctors = () => {
       .then(r => { setDoctors(r.data); setFiltered(r.data) })
       .catch(() => {})
       .finally(() => setLoading(false))
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {

@@ -54,7 +54,8 @@ const Home = () => {
   const [statsRef, statsVisible] = useInView()
   const [featRef, featVisible] = useInView()
   const [testRef, testVisible] = useInView()
-  const [blogRef, blogVisible] = useInView()
+  const [blogRef] = useInView()
+
 
   return (
     <div className='min-h-screen'>
@@ -320,7 +321,7 @@ const Home = () => {
             <div key={i}>
               <h4 className='font-bold text-white mb-4 tracking-wide'>{col.title}</h4>
               <ul className='space-y-2'>
-                {col.links.map(l => <li key={l}><a href='#' className='text-green-300 text-sm hover:text-white transition-colors'>{l}</a></li>)}
+                {col.links.map(l => <li key={l}><button className='text-green-300 text-sm hover:text-white transition-colors bg-transparent border-none cursor-pointer p-0'>{l}</button></li>)}
               </ul>
             </div>
           ))}
