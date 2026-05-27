@@ -10,7 +10,8 @@ export const AuthProvider = ({ children }) => {
   })
   const [loading, setLoading] = useState(false)
 
-  const API = 'http://localhost:5000/api'
+  const API = 'https://ayurcare-backend-6r7i.onrender.com/api'
+
 
   const login = async (email, password) => {
     setLoading(true)

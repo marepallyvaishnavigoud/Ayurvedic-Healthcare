@@ -26,7 +26,7 @@ function AnimatedCard({ doc, index }) {
       </div>
       <div className='p-5'>
         <h2 className='text-lg font-bold text-gray-900'>{doc.name}</h2>
-        <p className='text-green-600 text-sm font-medium mt-0.5'>{doc.specialty}</p>
+        <p className='text-green-600 text-sm font-medium mt-0.5'>{doc.specialty || doc.specialization}</p>
         <div className='flex items-center gap-4 mt-3 text-xs text-gray-500'>
           <span>🩺 {doc.experience} exp</span>
           <span>👥 {doc.patients} patients</span>
@@ -69,8 +69,21 @@ const Doctors = () => {
 
   useEffect(() => {
     let result = doctors
-    if (search) result = result.filter(d => d.name.toLowerCase().includes(search.toLowerCase()) || d.specialty.toLowerCase().includes(search.toLowerCase()))
-    if (activeFilter !== 'All') result = result.filter(d => d.specialty.toLowerCase().includes(activeFilter.toLowerCase()))
+    if (search) {
+      result = result.filter(d => {
+        const name = d.name || ''
+        const specialty = d.specialty || d.specialization || ''
+        return name.toLowerCase().includes(search.toLowerCase()) || specialty.toLowerCase().includes(search.toLowerCase())
+      })
+    }
+
+    if (activeFilter !== 'All') {
+      result = result.filter(d => {
+        const specialty = d.specialty || d.specialization || ''
+        return specialty.toLowerCase().includes(activeFilter.toLowerCase())
+      })
+    }
+
     setFiltered(result)
   }, [search, activeFilter, doctors])
 

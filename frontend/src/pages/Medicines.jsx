@@ -9,27 +9,40 @@ const tagColors = { 'Best Seller': 'bg-amber-500', 'Popular': 'bg-blue-500', 'Ne
 
 // Local images served from public/medicines/ — always loads, perfectly matched
 const medicineImages = {
-  'Ashwagandha':     '/medicines/ashwagandha.jpg',
-  'Triphala':        '/medicines/triphala.jpg',
-  'Brahmi':          '/medicines/brahmi.jpg',
-  'Neem Capsules':   '/medicines/neem.jpg',
-  'Turmeric Extract':'/medicines/turmeric.jpg',
-  'Shatavari':       '/medicines/shatavari.jpg',
-  'Giloy Juice':     '/medicines/giloy.jpg',
-  'Amla Powder':     '/medicines/amla.jpg',
-  'Moringa Tablets': '/medicines/moringa.jpg',
-  'Chyawanprash':    '/medicines/chyawanprash.jpg',
-  'Shilajit Resin':  '/medicines/shilajit.jpg',
-  'Haritaki Churna': '/medicines/haritaki.jpg',
+  'ashwagandha':     '/medicines/ashwagandha.jpg',
+  'triphala':        '/medicines/triphala.jpg',
+  'brahmi':          '/medicines/brahmi.jpg',
+  'neem capsules':   '/medicines/neem.jpg',
+  'turmeric extract':'/medicines/turmeric.jpg',
+  'shatavari':       '/medicines/shatavari.jpg',
+  'giloy juice':     '/medicines/giloy.jpg',
+  'amla powder':     '/medicines/amla.jpg',
+  'moringa tablets': '/medicines/moringa.jpg',
+  'chyawanprash':    '/medicines/chyawanprash.jpg',
+  'shilajit resin':  '/medicines/shilajit.jpg',
+  'haritaki churna': '/medicines/haritaki.jpg',
 }
 
 const fallbackImg = '/medicines/ashwagandha.jpg'
+
+function normalizeName(name) {
+  return String(name || '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLowerCase()
+}
+
+function getMedicineImg(med) {
+  const normalized = normalizeName(med?.name)
+  return medicineImages[normalized] || med?.img || fallbackImg
+}
 
 function AnimatedCard({ med, index }) {
   const ref = useRef(null)
   const [visible, setVisible] = useState(false)
   const [wishlisted, setWishlisted] = useState(false)
-  const [imgSrc, setImgSrc] = useState(medicineImages[med.name] || med.img || fallbackImg)
+  const [imgSrc, setImgSrc] = useState(getMedicineImg(med))
+
   const { addToCart } = useCart()
 
   const { user } = useAuth()
@@ -75,8 +88,8 @@ function AnimatedCard({ med, index }) {
         <div className='absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-black/20 to-transparent' />
       </div>
       <div className='p-5'>
-        <h2 className='text-lg font-bold text-gray-900'>{med.name}</h2>
-        <p className='text-gray-500 text-sm mt-1 leading-relaxed'>{med.desc}</p>
+  <h2 className='text-lg font-bold text-gray-900'>{med.name}</h2>
+        <p className='text-gray-500 text-sm mt-1 leading-relaxed'>{med.desc || med.description || ''}</p>
         <div className='flex items-center gap-2 mt-3'>
           <span className='text-green-700 font-bold text-xl'>₹{med.price}</span>
           <span className='text-gray-400 text-sm line-through'>₹{med.original}</span>
@@ -116,7 +129,12 @@ const Medicines = () => {
   useEffect(() => {
     let result = medicines
     if (search) result = result.filter(m => m.name.toLowerCase().includes(search.toLowerCase()))
-    if (activeCategory !== 'All') result = result.filter(m => m.category === activeCategory)
+    if (activeCategory !== 'All') {
+      result = result.filter(m => {
+        const category = m.category || m.cat || m.type || ''
+        return category === activeCategory
+      })
+    }
     setFiltered(result)
   }, [search, activeCategory, medicines])
 

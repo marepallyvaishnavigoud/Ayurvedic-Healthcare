@@ -77,6 +77,28 @@ const Treatments = () => {
   const filters = ['All', 'Detox', 'Relaxation', 'Pain Relief', 'Skin Care', 'Weight Loss', 'Eye Care']
 
   useEffect(() => {
+    if (activeFilter === 'All') {
+      setFiltered(Array.isArray(treatments) ? treatments : [])
+      return
+    }
+
+    const safeTreatments = Array.isArray(treatments) ? treatments : []
+
+    setFiltered(
+      safeTreatments.filter(t => {
+        const benefit = t.benefit || t.benefits || ''
+        const name = t.name || t.title || ''
+        return (
+          String(benefit).toLowerCase().includes(activeFilter.toLowerCase()) ||
+          String(name).toLowerCase().includes(activeFilter.toLowerCase())
+        )
+      })
+    )
+  }, [activeFilter, treatments])
+
+
+
+  useEffect(() => {
     axios.get(`${API}/treatments`)
       .then(r => { setTreatments(r.data); setFiltered(r.data) })
       .catch(() => {})
@@ -84,10 +106,7 @@ const Treatments = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  useEffect(() => {
-    if (activeFilter === 'All') return setFiltered(treatments)
-    setFiltered(treatments.filter(t => t.benefit.toLowerCase().includes(activeFilter.toLowerCase()) || t.name.toLowerCase().includes(activeFilter.toLowerCase())))
-  }, [activeFilter, treatments])
+
 
   return (
     <div className='min-h-screen bg-gray-50'>
