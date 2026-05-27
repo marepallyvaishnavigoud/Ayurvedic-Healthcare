@@ -18,7 +18,12 @@ function AnimatedCard({ doc, index }) {
   return (
     <div ref={ref} className={`bg-white rounded-2xl overflow-hidden shadow-md card-hover transition-all duration-700 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`} style={{ transitionDelay: `${(index % 4) * 100}ms` }}>
       <div className='relative overflow-hidden'>
-        <img src={doc.img} alt={doc.name} className='w-full h-60 object-cover object-top hover:scale-105 transition-transform duration-500' />
+        <img
+          src={doc.img}
+          alt={doc.name}
+          onError={e => { e.currentTarget.onerror = null; e.currentTarget.src = '' }}
+          className='w-full h-60 object-cover object-top hover:scale-105 transition-transform duration-500'
+        />
         <div className='absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-green-700 text-xs font-bold px-3 py-1 rounded-full shadow'>
           ⭐ {doc.rating}
         </div>

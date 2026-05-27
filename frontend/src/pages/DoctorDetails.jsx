@@ -62,8 +62,12 @@ const DoctorDetails = () => {
           <div className='bg-gradient-to-r from-green-700 to-green-900 h-32'></div>
           <div className='px-8 pb-8 -mt-16'>
             <div className='flex flex-col md:flex-row gap-6 items-start'>
-              <img src={doctor.img} alt={doctor.name}
-                className='w-32 h-32 rounded-2xl object-cover border-4 border-white shadow-xl' />
+              <img
+                src={doctor.img}
+                alt={doctor.name}
+                onError={e => { e.currentTarget.onerror = null; e.currentTarget.src = '' }}
+                className='w-32 h-32 rounded-2xl object-cover border-4 border-white shadow-xl'
+              />
               <div className='flex-1 pt-4 md:pt-16'>
                 <div className='flex flex-wrap items-start justify-between gap-4'>
                   <div>
