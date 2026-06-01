@@ -6,6 +6,26 @@ import { useAuth } from '../context/AuthContext'
 
 const statusColors = { Confirmed: 'bg-green-100 text-green-700', Pending: 'bg-yellow-100 text-yellow-700', Cancelled: 'bg-red-100 text-red-600' }
 
+const treatmentImages = {
+  'Panchakarma':   '/treatments/panchakarma.jpg',
+  'Abhyanga':      '/treatments/abhyanga.jpg',
+  'Shirodhara':    '/treatments/shirodhara.jpg',
+  'Nasya':         '/treatments/nasya.jpg',
+  'Kati Basti':    '/treatments/kati-basti.jpg',
+  'Udvartana':     '/treatments/udvartana.jpg',
+  'Netra Tarpana': '/treatments/netra-tarpana.jpg',
+  'Basti':         '/treatments/basti.jpg',
+  'Pizhichil':     '/treatments/pizhichil.jpg',
+  'Yoga Therapy':  '/treatments/yoga-therapy.jpg',
+  'Marma Therapy': '/treatments/marma-therapy.jpg',
+  'Raktamokshana': '/treatments/raktamokshana.jpg',
+}
+
+function getTreatmentImg(booking) {
+  const name = booking?.treatment?.name
+  return treatmentImages[name] || booking?.treatmentImg || booking?.treatment?.img || '/treatments/panchakarma.jpg'
+}
+
 const MyTreatmentBookings = () => {
   const { authHeader, API } = useAuth()
   const [bookings, setBookings] = useState([])
@@ -54,7 +74,7 @@ const MyTreatmentBookings = () => {
           <div className='space-y-4'>
             {bookings.map(b => (
               <div key={b._id} className='bg-white rounded-2xl shadow-md p-6 flex flex-col md:flex-row gap-4 items-start md:items-center'>
-                <img src={b.treatment?.img} alt={b.treatment?.name} className='w-20 h-20 rounded-xl object-cover flex-shrink-0' />
+                <img src={getTreatmentImg(b)} alt={b.treatment?.name} className='w-20 h-20 rounded-xl object-cover flex-shrink-0' />
                 <div className='flex-1'>
                   <div className='flex items-center gap-3 flex-wrap'>
                     <h3 className='font-bold text-gray-900 text-lg'>{b.treatment?.name}</h3>
