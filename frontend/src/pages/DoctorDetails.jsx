@@ -30,7 +30,7 @@ const DoctorDetails = () => {
     setSubmitting(true)
     try {
       await axios.post(`${API}/appointments`, { ...form, doctor: id, fee: doctor.fee }, authHeader())
-      toast.success('Appointment booked successfully! 🎉')
+      toast.success('Appointment booked successfully!')
       setShowBooking(false)
       navigate('/my-appointments')
     } catch (err) {
@@ -42,6 +42,9 @@ const DoctorDetails = () => {
 
   const today = new Date().toISOString().split('T')[0]
 
+  // resolve image — DB field is "img"
+  const docImg = doctor?.img || doctor?.image || ''
+
   if (loading) return (
     <div className='min-h-screen flex items-center justify-center pt-20'>
       <div className='text-center'>
@@ -51,7 +54,11 @@ const DoctorDetails = () => {
     </div>
   )
 
-  if (!doctor) return <div className='min-h-screen flex items-center justify-center pt-20'><p className='text-gray-500'>Doctor not found</p></div>
+  if (!doctor) return (
+    <div className='min-h-screen flex items-center justify-center pt-20'>
+      <p className='text-gray-500'>Doctor not found</p>
+    </div>
+  )
 
   return (
     <div className='min-h-screen bg-gray-50 pt-24 pb-16'>
@@ -63,15 +70,10 @@ const DoctorDetails = () => {
           <div className='px-8 pb-8 -mt-16'>
             <div className='flex flex-col md:flex-row gap-6 items-start'>
               <img
-                src={doctor.image || 'https://via.placeholder.com/300x300?text=Doctor'}
+                src={docImg}
                 alt={doctor.name}
-                onError={(e) => {
-                  e.currentTarget.onerror = null
-
-                  e.currentTarget.src = 'https://via.placeholder.com/300x300?text=Doctor'
-                }}
-                className='w-32 h-32 rounded-2xl object-cover border-4 border-white shadow-xl'
-                referrerPolicy='no-referrer'
+                onError={e => { e.currentTarget.onerror = null; e.currentTarget.src = 'https://placehold.co/300x300/16a34a/white?text=Dr' }}
+                className='w-32 h-32 rounded-2xl object-cover object-top border-4 border-white shadow-xl'
               />
               <div className='flex-1 pt-4 md:pt-16'>
                 <div className='flex flex-wrap items-start justify-between gap-4'>
@@ -81,15 +83,17 @@ const DoctorDetails = () => {
                     <p className='text-gray-500 text-sm mt-1'>{doctor.education}</p>
                   </div>
                   <div className='text-right'>
-                    <div className='text-3xl font-bold text-green-700'>₹{doctor.fee}</div>
+                    <div className='text-3xl font-bold text-green-700'>&#8377;{doctor.fee}</div>
                     <div className='text-gray-400 text-sm'>Consultation Fee</div>
                   </div>
                 </div>
-                <div className='flex flex-wrap gap-4 mt-4 text-sm'>
-                  <span className='flex items-center gap-1 bg-green-50 text-green-700 px-3 py-1.5 rounded-full font-medium'>⭐ {doctor.rating} Rating</span>
-                  <span className='flex items-center gap-1 bg-blue-50 text-blue-700 px-3 py-1.5 rounded-full font-medium'>🩺 {doctor.experience} Experience</span>
-                  <span className='flex items-center gap-1 bg-amber-50 text-amber-700 px-3 py-1.5 rounded-full font-medium'>👥 {doctor.patients} Patients</span>
-                  {doctor.languages?.map(l => <span key={l} className='bg-gray-100 text-gray-600 px-3 py-1.5 rounded-full font-medium'>{l}</span>)}
+                <div className='flex flex-wrap gap-3 mt-4 text-sm'>
+                  <span className='bg-green-50 text-green-700 px-3 py-1.5 rounded-full font-medium'>&#11088; {doctor.rating} Rating</span>
+                  <span className='bg-blue-50 text-blue-700 px-3 py-1.5 rounded-full font-medium'>&#128314; {doctor.experience} Experience</span>
+                  <span className='bg-amber-50 text-amber-700 px-3 py-1.5 rounded-full font-medium'>&#128101; {doctor.patients} Patients</span>
+                  {doctor.languages?.map(l => (
+                    <span key={l} className='bg-gray-100 text-gray-600 px-3 py-1.5 rounded-full font-medium'>{l}</span>
+                  ))}
                 </div>
               </div>
             </div>
@@ -98,18 +102,21 @@ const DoctorDetails = () => {
 
         <div className='grid md:grid-cols-3 gap-8'>
           <div className='md:col-span-2 space-y-6'>
+
             {/* About */}
             <div className='bg-white rounded-2xl shadow-md p-6'>
               <h2 className='text-xl font-bold text-green-900 mb-3'>About Doctor</h2>
               <p className='text-gray-600 leading-relaxed'>{doctor.about}</p>
             </div>
 
-            {/* Available Timings */}
+            {/* Timings */}
             <div className='bg-white rounded-2xl shadow-md p-6'>
               <h2 className='text-xl font-bold text-green-900 mb-4'>Available Time Slots</h2>
               <div className='flex flex-wrap gap-3'>
                 {doctor.timings?.map(t => (
-                  <span key={t} className='bg-green-50 border border-green-200 text-green-700 px-4 py-2 rounded-xl text-sm font-medium'>🕐 {t}</span>
+                  <span key={t} className='bg-green-50 border border-green-200 text-green-700 px-4 py-2 rounded-xl text-sm font-medium'>
+                    &#128336; {t}
+                  </span>
                 ))}
               </div>
             </div>
@@ -127,7 +134,7 @@ const DoctorDetails = () => {
                 </div>
               )) : (
                 <div className='text-center py-8 text-gray-400'>
-                  <div className='text-4xl mb-2'>💬</div>
+                  <div className='text-4xl mb-2'>&#128172;</div>
                   <p>No reviews yet. Be the first to review!</p>
                 </div>
               )}
@@ -135,18 +142,34 @@ const DoctorDetails = () => {
           </div>
 
           {/* Booking Sidebar */}
-          <div className='space-y-4'>
+          <div>
             <div className='bg-white rounded-2xl shadow-md p-6 sticky top-24'>
-              <h2 className='text-xl font-bold text-green-900 mb-2'>Book Appointment</h2>
-              <p className='text-gray-500 text-sm mb-4'>Consultation fee: <span className='text-green-700 font-bold'>₹{doctor.fee}</span></p>
-              <button onClick={() => { if (!user) navigate('/auth', { state: { from: `/doctors/${id}` } }); else setShowBooking(true) }}
-                className='w-full bg-gradient-to-r from-green-600 to-green-800 text-white py-3.5 rounded-xl font-semibold hover:shadow-lg hover:scale-[1.02] transition-all'>
+
+              {/* Doctor image + name in sidebar */}
+              <div className='flex items-center gap-3 mb-5 pb-5 border-b border-gray-100'>
+                <img
+                  src={docImg}
+                  alt={doctor.name}
+                  onError={e => { e.currentTarget.onerror = null; e.currentTarget.src = 'https://placehold.co/300x300/16a34a/white?text=Dr' }}
+                  className='w-16 h-16 rounded-xl object-cover object-top flex-shrink-0'
+                />
+                <div>
+                  <div className='font-bold text-gray-900 text-sm'>{doctor.name}</div>
+                  <div className='text-green-600 text-xs font-medium mt-0.5'>{doctor.specialty}</div>
+                  <div className='text-green-700 font-bold text-sm mt-1'>&#8377;{doctor.fee} <span className='text-gray-400 font-normal text-xs'>consult fee</span></div>
+                </div>
+              </div>
+
+              <button
+                onClick={() => { if (!user) navigate('/auth', { state: { from: `/doctors/${id}` } }); else setShowBooking(true) }}
+                className='w-full bg-gradient-to-r from-green-600 to-green-800 text-white py-3.5 rounded-xl font-semibold hover:shadow-lg hover:scale-[1.02] transition-all'
+              >
                 Book Appointment
               </button>
-              <div className='mt-4 p-4 bg-green-50 rounded-xl'>
-                <p className='text-green-800 text-xs font-medium'>✅ Instant Confirmation</p>
-                <p className='text-green-800 text-xs font-medium mt-1'>✅ Free Cancellation</p>
-                <p className='text-green-800 text-xs font-medium mt-1'>✅ Certified Practitioner</p>
+              <div className='mt-4 p-4 bg-green-50 rounded-xl space-y-1'>
+                <p className='text-green-800 text-xs font-medium'>&#9989; Instant Confirmation</p>
+                <p className='text-green-800 text-xs font-medium'>&#9989; Free Cancellation</p>
+                <p className='text-green-800 text-xs font-medium'>&#9989; Certified Practitioner</p>
               </div>
             </div>
           </div>
@@ -157,15 +180,26 @@ const DoctorDetails = () => {
       {showBooking && (
         <div className='fixed inset-0 bg-black/60 z-50 flex items-center justify-center px-4' onClick={() => setShowBooking(false)}>
           <div className='bg-white rounded-3xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto' onClick={e => e.stopPropagation()}>
+
+            {/* Modal header with doctor image */}
             <div className='bg-gradient-to-r from-green-700 to-green-900 p-6 rounded-t-3xl'>
               <div className='flex items-center justify-between'>
-                <div>
-                  <h2 className='text-xl font-bold text-white'>Book Appointment</h2>
-                  <p className='text-green-200 text-sm'>{doctor.name} · {doctor.specialty}</p>
+                <div className='flex items-center gap-4'>
+                  <img
+                    src={docImg}
+                    alt={doctor.name}
+                    onError={e => { e.currentTarget.onerror = null; e.currentTarget.src = 'https://placehold.co/300x300/16a34a/white?text=Dr' }}
+                    className='w-14 h-14 rounded-xl object-cover object-top border-2 border-white/40 flex-shrink-0'
+                  />
+                  <div>
+                    <h2 className='text-lg font-bold text-white'>{doctor.name}</h2>
+                    <p className='text-green-200 text-sm'>{doctor.specialty} &middot; &#8377;{doctor.fee}</p>
+                  </div>
                 </div>
-                <button onClick={() => setShowBooking(false)} className='text-white/70 hover:text-white text-2xl'>✕</button>
+                <button onClick={() => setShowBooking(false)} className='text-white/70 hover:text-white text-2xl leading-none'>&#10005;</button>
               </div>
             </div>
+
             <form onSubmit={bookAppointment} className='p-6 space-y-4'>
               <div className='grid grid-cols-2 gap-4'>
                 <div>
@@ -204,11 +238,11 @@ const DoctorDetails = () => {
               </div>
               <div className='bg-green-50 rounded-xl p-4 flex items-center justify-between'>
                 <span className='text-gray-600 font-medium'>Consultation Fee</span>
-                <span className='text-green-700 font-bold text-xl'>₹{doctor.fee}</span>
+                <span className='text-green-700 font-bold text-xl'>&#8377;{doctor.fee}</span>
               </div>
               <button type='submit' disabled={submitting}
                 className='w-full bg-gradient-to-r from-green-600 to-green-800 text-white py-4 rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-60'>
-                {submitting ? '⏳ Booking...' : 'Confirm Appointment ✅'}
+                {submitting ? 'Booking...' : 'Confirm Appointment'}
               </button>
             </form>
           </div>
