@@ -10,7 +10,11 @@ export const AuthProvider = ({ children }) => {
   })
   const [loading, setLoading] = useState(false)
 
-  const API = 'https://ayurcare-backend-6r7i.onrender.com/api'
+  // Use local backend during development; fall back to deployed backend on Vercel/production.
+  const API = (typeof window !== 'undefined' && window.location.hostname === 'localhost')
+    ? 'http://localhost:5000/api'
+    : 'https://ayurcare-backend-6r7i.onrender.com/api'
+
 
 
   const login = async (email, password) => {

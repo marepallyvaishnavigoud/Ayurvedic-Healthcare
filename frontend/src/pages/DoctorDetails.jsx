@@ -63,10 +63,15 @@ const DoctorDetails = () => {
           <div className='px-8 pb-8 -mt-16'>
             <div className='flex flex-col md:flex-row gap-6 items-start'>
               <img
-                src={doctor.img}
+                src={doctor.image || 'https://via.placeholder.com/300x300?text=Doctor'}
                 alt={doctor.name}
-                onError={e => { e.currentTarget.onerror = null; e.currentTarget.src = '' }}
+                onError={(e) => {
+                  e.currentTarget.onerror = null
+
+                  e.currentTarget.src = 'https://via.placeholder.com/300x300?text=Doctor'
+                }}
                 className='w-32 h-32 rounded-2xl object-cover border-4 border-white shadow-xl'
+                referrerPolicy='no-referrer'
               />
               <div className='flex-1 pt-4 md:pt-16'>
                 <div className='flex flex-wrap items-start justify-between gap-4'>

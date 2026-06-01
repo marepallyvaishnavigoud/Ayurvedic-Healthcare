@@ -26,11 +26,38 @@ const treatmentImages = {
   'Raktamokshana':  '/treatments/raktamokshana.jpg',
 }
 
+function normalizeTreatmentName(name) {
+  return String(name || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+function resolveTreatmentImg(t) {
+  const n = normalizeTreatmentName(t?.name)
+
+  // Build normalized lookup once per call (small list)
+  const direct = treatmentImages[t?.name]
+  if (direct) return direct
+
+  const keys = Object.keys(treatmentImages)
+  const hitKey = keys.find(k => {
+    const nk = normalizeTreatmentName(k)
+    return nk === n || n.includes(nk) || nk.includes(n)
+  })
+
+  if (hitKey) return treatmentImages[hitKey]
+
+  return t?.img || '/treatments/panchakarma.jpg'
+}
+
 function AnimatedCard({ t, index }) {
   const ref = useRef(null)
   const [visible, setVisible] = useState(false)
-  const [imgSrc, setImgSrc] = useState(treatmentImages[t.name] || t.img)
+  const [imgSrc, setImgSrc] = useState(resolveTreatmentImg(t))
   const navigate = useNavigate()
+
 
   useEffect(() => {
     const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) setVisible(true) }, { threshold: 0.1 })
@@ -41,7 +68,13 @@ function AnimatedCard({ t, index }) {
   return (
     <div ref={ref} className={`bg-white rounded-2xl overflow-hidden shadow-md card-hover transition-all duration-700 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`} style={{ transitionDelay: `${(index % 4) * 100}ms` }}>
       <div className='relative overflow-hidden'>
-        <img src={imgSrc} alt={t.name} onError={() => setImgSrc(t.img)} className='w-full h-48 object-cover hover:scale-110 transition-transform duration-500' />
+<img
+          src={imgSrc}
+          alt={t.name}
+          onError={() => setImgSrc(resolveTreatmentImg({ ...t, img: undefined }))}
+          className='w-full h-48 object-cover hover:scale-110 transition-transform duration-500'
+          referrerPolicy='no-referrer'
+        />
         <div className='absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent' />
         <span className='absolute bottom-3 left-3 bg-green-600/90 text-white text-xs font-bold px-3 py-1 rounded-full'>{t.benefit}</span>
         <span className='absolute bottom-3 right-3 bg-black/50 text-white text-xs px-3 py-1 rounded-full'>⏱ {t.duration}</span>

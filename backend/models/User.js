@@ -1,5 +1,6 @@
 import mongoose from 'mongoose'
 import bcrypt from 'bcryptjs'
+import crypto from 'crypto'
 
 const userSchema = new mongoose.Schema({
   name:     { type: String, required: true },
@@ -7,6 +8,8 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   phone:    { type: String, default: '' },
   address:  { type: String, default: '' },
+  resetPasswordToken:   { type: String },
+  resetPasswordExpires: { type: Date },
 }, { timestamps: true })
 
 userSchema.pre('save', async function (next) {

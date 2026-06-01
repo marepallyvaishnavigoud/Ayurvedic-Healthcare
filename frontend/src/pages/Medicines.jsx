@@ -27,14 +27,27 @@ const fallbackImg = '/medicines/ashwagandha.jpg'
 
 function normalizeName(name) {
   return String(name || '')
+    .toLowerCase()
+    .replace(/&/g, ' and ')
+    .replace(/[^a-z0-9\s]/g, ' ') // remove punctuation
     .replace(/\s+/g, ' ')
     .trim()
-    .toLowerCase()
 }
 
 function getMedicineImg(med) {
   const normalized = normalizeName(med?.name)
-  return medicineImages[normalized] || med?.img || fallbackImg
+
+  // Try direct match
+  if (medicineImages[normalized]) return medicineImages[normalized]
+
+  // Try token/partial matches (handles cases like "Neem Capsules" vs "neem")
+  const normalizedNoSpaces = normalized.replace(/\s+/g, ' ').trim()
+  const keys = Object.keys(medicineImages)
+  const hit = keys.find(k => normalizedNoSpaces.includes(k) || k.includes(normalizedNoSpaces))
+  if (hit) return medicineImages[hit]
+
+  // Backend sometimes returns img field
+  return med?.img || fallbackImg
 }
 
 function AnimatedCard({ med, index }) {

@@ -19,10 +19,15 @@ function AnimatedCard({ doc, index }) {
     <div ref={ref} className={`bg-white rounded-2xl overflow-hidden shadow-md card-hover transition-all duration-700 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`} style={{ transitionDelay: `${(index % 4) * 100}ms` }}>
       <div className='relative overflow-hidden'>
         <img
-          src={doc.img}
-          alt={doc.name}
-          onError={e => { e.currentTarget.onerror = null; e.currentTarget.src = '' }}
+          src={doc?.image || doc?.img || 'https://via.placeholder.com/300x300?text=Doctor'}
+          alt={doc?.name || 'Doctor'}
+          onError={(e) => {
+            e.currentTarget.onerror = null
+            e.currentTarget.src = 'https://via.placeholder.com/300x300?text=Doctor'
+          }}
           className='w-full h-60 object-cover object-top hover:scale-105 transition-transform duration-500'
+          referrerPolicy='no-referrer'
+          loading='lazy'
         />
         <div className='absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-green-700 text-xs font-bold px-3 py-1 rounded-full shadow'>
           ⭐ {doc.rating}
@@ -66,10 +71,13 @@ const Doctors = () => {
 
   useEffect(() => {
     axios.get(`${API}/doctors`)
-      .then(r => { setDoctors(r.data); setFiltered(r.data) })
+      .then(r => {
+        setDoctors(r.data)
+        setFiltered(r.data)
+      })
       .catch(() => {})
       .finally(() => setLoading(false))
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
@@ -123,6 +131,12 @@ const Doctors = () => {
         {loading ? (
           <div className='flex justify-center py-20'>
             <div className='w-12 h-12 border-4 border-green-600 border-t-transparent rounded-full animate-spin'></div>
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className='py-16 text-center'>
+            <div className='text-5xl mb-3'>🩺</div>
+            <h2 className='text-xl font-bold text-gray-800'>No doctors found</h2>
+            <p className='text-gray-500 mt-1'>Try clearing filters or check your internet connection.</p>
           </div>
         ) : (
           <div className='grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6'>
