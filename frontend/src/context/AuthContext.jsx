@@ -5,17 +5,18 @@ const AuthContext = createContext()
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
-    const saved = localStorage.getItem('ayurUser')
-    return saved ? JSON.parse(saved) : null
+    try {
+      const saved = localStorage.getItem('ayurUser')
+      return saved ? JSON.parse(saved) : null
+    } catch {
+      return null
+    }
   })
   const [loading, setLoading] = useState(false)
 
-  // Use local backend during development; fall back to deployed backend on Vercel/production.
-  const API = (typeof window !== 'undefined' && window.location.hostname === 'localhost')
-    ? 'http://localhost:5000/api'
-    : 'https://ayurcare-backend-6r7i.onrender.com/api'
-
-
+  // Use REACT_APP_API_URL env var in production (set in Vercel dashboard)
+  // Falls back to localhost for local development
+  const API = process.env.REACT_APP_API_URL || 'http://localhost:5000/api'
 
   const login = async (email, password) => {
     setLoading(true)
@@ -50,7 +51,17 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('ayurUser')
   }
 
-  const authHeader = () => ({ headers: { Authorization: `Bearer ${user?.token}` } })
+  // Always read fresh token from localStorage to avoid stale token issues
+  const authHeader = () => {
+    try {
+      const saved = localStorage.getItem('ayurUser')
+      const parsed = saved ? JSON.parse(saved) : null
+      const token = parsed?.token
+      return { headers: { Authorization: `Bearer ${token}` } }
+    } catch {
+      return { headers: { Authorization: `Bearer ${user?.token}` } }
+    }
+  }
 
   return (
     <AuthContext.Provider value={{ user, login, register, logout, loading, authHeader, API }}>

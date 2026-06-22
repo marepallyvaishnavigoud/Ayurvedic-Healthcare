@@ -16,10 +16,19 @@ dotenv.config()
 const app = express()
 
 app.use(cors({
-  origin: [
-    'http://localhost:3000',
-    process.env.FRONTEND_URL || 'http://localhost:3000',
-  ],
+  origin: function (origin, callback) {
+    // Allow requests with no origin (mobile apps, curl, Postman)
+    if (!origin) return callback(null, true)
+    const allowed = [
+      'http://localhost:3000',
+      'http://localhost:5173',
+      process.env.FRONTEND_URL,
+    ].filter(Boolean)
+    if (allowed.includes(origin) || process.env.NODE_ENV !== 'production') {
+      return callback(null, true)
+    }
+    return callback(null, true) // allow all during initial deployment
+  },
   credentials: true,
 }))
 app.use(express.json())
