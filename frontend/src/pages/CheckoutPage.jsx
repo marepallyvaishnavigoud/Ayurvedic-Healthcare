@@ -7,7 +7,7 @@ import { useAuth } from '../context/AuthContext'
 
 const CheckoutPage = () => {
   const { cart, cartTotal, clearCart } = useCart()
-  const { user, authHeader, API } = useAuth()
+  const { user, API } = useAuth()
   const navigate = useNavigate()
   const [submitting, setSubmitting] = useState(false)
   const [payment, setPayment] = useState('COD')
@@ -19,16 +19,38 @@ const CheckoutPage = () => {
 
   const placeOrder = async (e) => {
     e.preventDefault()
+    // Guard: ensure user is still logged in with a valid token
+    const saved = localStorage.getItem('ayurUser')
+    if (!saved) {
+      toast.error('Please sign in to place your order')
+      navigate('/auth', { state: { from: '/checkout' } })
+      return
+    }
+    const freshUser = JSON.parse(saved)
+    if (!freshUser?.token) {
+      toast.error('Session expired. Please sign in again.')
+      navigate('/auth', { state: { from: '/checkout' } })
+      return
+    }
     setSubmitting(true)
     try {
       const items = cart.map(i => ({ medicine: i._id, name: i.name, img: i.img, price: i.price, qty: i.qty }))
       const address = `${form.name}, ${form.address}, ${form.city} - ${form.pincode}`
-      const { data } = await axios.post(`${API}/orders`, { items, address, phone: form.phone, total, paymentMethod: payment }, authHeader())
+      const { data } = await axios.post(
+        `${API}/orders`,
+        { items, address, phone: form.phone, total, paymentMethod: payment },
+        { headers: { Authorization: `Bearer ${freshUser.token}` } }
+      )
       clearCart()
       toast.success('Order placed successfully! 🎉')
       navigate('/order-success', { state: { order: data } })
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Order failed')
+      if (err.response?.status === 401) {
+        toast.error('Session expired. Please sign in again.')
+        navigate('/auth', { state: { from: '/checkout' } })
+      } else {
+        toast.error(err.response?.data?.message || 'Order failed. Please try again.')
+      }
     } finally {
       setSubmitting(false)
     }

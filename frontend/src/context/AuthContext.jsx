@@ -1,29 +1,59 @@
-import React, { createContext, useContext, useState } from 'react'
+import React, { createContext, useContext, useState, useEffect } from 'react'
 import axios from 'axios'
 
 const AuthContext = createContext()
+
+// Single axios instance used across the whole app
+export const api = axios.create()
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
     try {
       const saved = localStorage.getItem('ayurUser')
-      return saved ? JSON.parse(saved) : null
+      if (!saved) return null
+      const parsed = JSON.parse(saved)
+      // Validate token structure — 3 parts separated by dots
+      if (!parsed?.token || parsed.token.split('.').length !== 3) {
+        localStorage.removeItem('ayurUser')
+        return null
+      }
+      return parsed
     } catch {
+      localStorage.removeItem('ayurUser')
       return null
     }
   })
+
   const [loading, setLoading] = useState(false)
 
-  // Use REACT_APP_API_URL env var in production (set in Vercel dashboard)
-  // Falls back to localhost for local development
   const API = process.env.REACT_APP_API_URL || 'http://localhost:5000/api'
+
+  // Auto logout on 401 from any request
+  useEffect(() => {
+    const interceptor = api.interceptors.response.use(
+      res => res,
+      err => {
+        if (err.response?.status === 401) {
+          setUser(null)
+          localStorage.removeItem('ayurUser')
+          window.location.href = '/auth'
+        }
+        return Promise.reject(err)
+      }
+    )
+    return () => api.interceptors.response.eject(interceptor)
+  }, [])
+
+  const saveUser = (data) => {
+    setUser(data)
+    localStorage.setItem('ayurUser', JSON.stringify(data))
+  }
 
   const login = async (email, password) => {
     setLoading(true)
     try {
       const { data } = await axios.post(`${API}/auth/login`, { email, password })
-      setUser(data)
-      localStorage.setItem('ayurUser', JSON.stringify(data))
+      saveUser(data)
       return { success: true }
     } catch (err) {
       return { success: false, message: err.response?.data?.message || 'Login failed' }
@@ -36,8 +66,7 @@ export const AuthProvider = ({ children }) => {
     setLoading(true)
     try {
       const { data } = await axios.post(`${API}/auth/register`, { name, email, password })
-      setUser(data)
-      localStorage.setItem('ayurUser', JSON.stringify(data))
+      saveUser(data)
       return { success: true }
     } catch (err) {
       return { success: false, message: err.response?.data?.message || 'Registration failed' }
@@ -51,12 +80,11 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('ayurUser')
   }
 
-  // Always read fresh token from localStorage to avoid stale token issues
+  // Always read fresh token from localStorage
   const authHeader = () => {
     try {
       const saved = localStorage.getItem('ayurUser')
-      const parsed = saved ? JSON.parse(saved) : null
-      const token = parsed?.token
+      const token = saved ? JSON.parse(saved)?.token : user?.token
       return { headers: { Authorization: `Bearer ${token}` } }
     } catch {
       return { headers: { Authorization: `Bearer ${user?.token}` } }
