@@ -76,9 +76,17 @@ const Navbar = () => {
             <div className='relative ml-2' ref={userMenuRef}>
               <button onClick={() => setUserMenuOpen(!userMenuOpen)}
                 className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${isSolid ? 'text-gray-700 hover:bg-green-50' : 'text-white hover:bg-white/20'}`}>
-                <div className='w-7 h-7 bg-green-600 rounded-full flex items-center justify-center text-white text-xs font-bold'>
-                  {user.name?.charAt(0).toUpperCase()}
-                </div>
+                {user.profilePicture ? (
+                  <img
+                    src={user.profilePicture}
+                    alt={user.name}
+                    className='w-7 h-7 rounded-full object-cover'
+                  />
+                ) : (
+                  <div className='w-7 h-7 bg-green-600 rounded-full flex items-center justify-center text-white text-xs font-bold'>
+                    {user.name?.charAt(0).toUpperCase()}
+                  </div>
+                )}
                 {user.name?.split(' ')[0]}
                 <span className='text-xs'>▾</span>
               </button>

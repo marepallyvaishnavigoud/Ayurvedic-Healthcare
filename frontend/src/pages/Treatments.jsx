@@ -110,34 +110,23 @@ const Treatments = () => {
   const filters = ['All', 'Detox', 'Relaxation', 'Pain Relief', 'Skin Care', 'Weight Loss', 'Eye Care']
 
   useEffect(() => {
-    if (activeFilter === 'All') {
-      setFiltered(Array.isArray(treatments) ? treatments : [])
-      return
-    }
-
-    const safeTreatments = Array.isArray(treatments) ? treatments : []
-
-    setFiltered(
-      safeTreatments.filter(t => {
-        const benefit = t.benefit || t.benefits || ''
-        const name = t.name || t.title || ''
-        return (
-          String(benefit).toLowerCase().includes(activeFilter.toLowerCase()) ||
-          String(name).toLowerCase().includes(activeFilter.toLowerCase())
-        )
-      })
-    )
-  }, [activeFilter, treatments])
-
-
-
-  useEffect(() => {
     axios.get(`${API}/treatments`)
       .then(r => { setTreatments(r.data); setFiltered(r.data) })
       .catch(() => {})
       .finally(() => setLoading(false))
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  useEffect(() => {
+    if (!treatments.length) return
+    if (activeFilter === 'All') { setFiltered(treatments); return }
+    setFiltered(treatments.filter(t => {
+      const benefit = String(t.benefit || '')
+      const name = String(t.name || '')
+      return benefit.toLowerCase().includes(activeFilter.toLowerCase()) ||
+             name.toLowerCase().includes(activeFilter.toLowerCase())
+    }))
+  }, [activeFilter, treatments])
 
 
 

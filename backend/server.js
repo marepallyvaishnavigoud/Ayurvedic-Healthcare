@@ -10,14 +10,14 @@ import appointmentsRouter from './routes/appointments.js'
 import ordersRouter from './routes/orders.js'
 import treatmentBookingsRouter from './routes/treatmentBookings.js'
 import aiRouter from './routes/ai.js'
-
+import adminRouter from './routes/admin.js'
 dotenv.config()
+
 
 const app = express()
 
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (mobile apps, curl, Postman)
     if (!origin) return callback(null, true)
     const allowed = [
       'http://localhost:3000',
@@ -27,7 +27,7 @@ app.use(cors({
     if (allowed.includes(origin) || process.env.NODE_ENV !== 'production') {
       return callback(null, true)
     }
-    return callback(null, true) // allow all during initial deployment
+    return callback(null, true)
   },
   credentials: true,
 }))
@@ -41,8 +41,11 @@ app.use('/api/appointments', appointmentsRouter)
 app.use('/api/orders', ordersRouter)
 app.use('/api/treatment-bookings', treatmentBookingsRouter)
 app.use('/api/ai', aiRouter)
+app.use('/api/admin', adminRouter)
+
 
 app.get('/', (req, res) => res.send('AyurCare Backend Running ✅'))
+
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('✅ MongoDB Connected'))

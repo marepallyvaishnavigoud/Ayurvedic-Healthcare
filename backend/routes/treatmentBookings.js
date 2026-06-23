@@ -1,47 +1,29 @@
 import express from 'express'
 import TreatmentBooking from '../models/TreatmentBooking.js'
-import protect from '../middleware/auth.js'
+import { protect } from '../middleware/auth.js'
 
 const router = express.Router()
 
-// POST /api/treatment-bookings
 router.post('/', protect, async (req, res) => {
   try {
     const { treatment, date, timeSlot, patientName, patientPhone, center, price, treatmentImg } = req.body
     const booking = await TreatmentBooking.create({
-      user: req.user._id,
-      treatment,
-      treatmentImg,
-      date,
-      timeSlot,
-      patientName,
-      patientPhone,
-      center,
-      price
+      user: req.user._id, treatment, treatmentImg, date, timeSlot, patientName, patientPhone, center, price
     })
-
     const populated = await booking.populate('treatment', 'name img duration')
-    // booking will also include treatmentImg field (stored explicitly)
     res.status(201).json(populated)
-
-  } catch (err) {
-    res.status(500).json({ message: err.message })
-  }
+  } catch (err) { res.status(500).json({ message: err.message }) }
 })
 
-// GET /api/treatment-bookings/mine
 router.get('/mine', protect, async (req, res) => {
   try {
     const bookings = await TreatmentBooking.find({ user: req.user._id })
       .populate('treatment', 'name img duration benefit')
       .sort({ createdAt: -1 })
     res.json(bookings)
-  } catch (err) {
-    res.status(500).json({ message: err.message })
-  }
+  } catch (err) { res.status(500).json({ message: err.message }) }
 })
 
-// DELETE /api/treatment-bookings/:id
 router.delete('/:id', protect, async (req, res) => {
   try {
     const booking = await TreatmentBooking.findById(req.params.id)
@@ -51,9 +33,7 @@ router.delete('/:id', protect, async (req, res) => {
     booking.status = 'Cancelled'
     await booking.save()
     res.json({ message: 'Booking cancelled' })
-  } catch (err) {
-    res.status(500).json({ message: err.message })
-  }
+  } catch (err) { res.status(500).json({ message: err.message }) }
 })
 
 export default router

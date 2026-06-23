@@ -1,10 +1,9 @@
 import express from 'express'
 import Appointment from '../models/Appointment.js'
-import protect from '../middleware/auth.js'
+import { protect } from '../middleware/auth.js'
 
 const router = express.Router()
 
-// POST /api/appointments  (protected)
 router.post('/', protect, async (req, res) => {
   try {
     const { doctor, date, timeSlot, patientName, patientAge, patientPhone, concern, fee } = req.body
@@ -14,24 +13,18 @@ router.post('/', protect, async (req, res) => {
     })
     const populated = await appt.populate('doctor', 'name specialty img fee')
     res.status(201).json(populated)
-  } catch (err) {
-    res.status(500).json({ message: err.message })
-  }
+  } catch (err) { res.status(500).json({ message: err.message }) }
 })
 
-// GET /api/appointments/mine  (protected)
 router.get('/mine', protect, async (req, res) => {
   try {
     const appts = await Appointment.find({ user: req.user._id })
       .populate('doctor', 'name specialty img fee')
       .sort({ createdAt: -1 })
     res.json(appts)
-  } catch (err) {
-    res.status(500).json({ message: err.message })
-  }
+  } catch (err) { res.status(500).json({ message: err.message }) }
 })
 
-// DELETE /api/appointments/:id  (cancel)
 router.delete('/:id', protect, async (req, res) => {
   try {
     const appt = await Appointment.findById(req.params.id)
@@ -41,9 +34,7 @@ router.delete('/:id', protect, async (req, res) => {
     appt.status = 'Cancelled'
     await appt.save()
     res.json({ message: 'Appointment cancelled' })
-  } catch (err) {
-    res.status(500).json({ message: err.message })
-  }
+  } catch (err) { res.status(500).json({ message: err.message }) }
 })
 
 export default router

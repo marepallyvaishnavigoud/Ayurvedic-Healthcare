@@ -46,12 +46,20 @@ const TreatmentDetails = () => {
   const bookTreatment = async (e) => {
     e.preventDefault()
     if (!user) return navigate('/auth', { state: { from: `/treatments/${id}` } })
+    const saved = localStorage.getItem('ayurUser')
+    const freshToken = saved ? JSON.parse(saved)?.token : user?.token
+    if (!freshToken) {
+      toast.error('Session expired. Please sign in again.')
+      return navigate('/auth')
+    }
     setSubmitting(true)
     try {
-      // Keep selected treatment image consistent on booking page
-      await axios.post(`${API}/treatment-bookings`, { ...form, treatment: id, price: treatment.price, treatmentImg: treatment.img }, authHeader())
-      toast.success('Treatment booked successfully! 🎉')
-
+      await axios.post(
+        `${API}/treatment-bookings`,
+        { ...form, treatment: id, price: treatment.price, treatmentImg: treatment.img },
+        { headers: { Authorization: `Bearer ${freshToken}` } }
+      )
+      toast.success('Treatment booked successfully!')
       setShowBooking(false)
       navigate('/my-treatment-bookings')
     } catch (err) {

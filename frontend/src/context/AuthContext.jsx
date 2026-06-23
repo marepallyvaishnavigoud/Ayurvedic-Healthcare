@@ -75,6 +75,20 @@ export const AuthProvider = ({ children }) => {
     }
   }
 
+  const loginWithGoogle = async (token) => {
+    setLoading(true)
+    try {
+      const { data } = await axios.post(`${API}/auth/google`, { token })
+      saveUser(data)
+      return { success: true }
+    } catch (err) {
+      return { success: false, message: err.response?.data?.message || 'Google login failed' }
+    } finally {
+      setLoading(false)
+    }
+  }
+
+
   const logout = () => {
     setUser(null)
     localStorage.removeItem('ayurUser')
@@ -92,7 +106,8 @@ export const AuthProvider = ({ children }) => {
   }
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, loading, authHeader, API }}>
+    <AuthContext.Provider value={{ user, login, register, loginWithGoogle, logout, loading, authHeader, API }}>
+
       {children}
     </AuthContext.Provider>
   )

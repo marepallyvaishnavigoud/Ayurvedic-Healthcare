@@ -27,9 +27,19 @@ const DoctorDetails = () => {
   const bookAppointment = async (e) => {
     e.preventDefault()
     if (!user) return navigate('/auth', { state: { from: `/doctors/${id}` } })
+    const saved = localStorage.getItem('ayurUser')
+    const freshToken = saved ? JSON.parse(saved)?.token : user?.token
+    if (!freshToken) {
+      toast.error('Session expired. Please sign in again.')
+      return navigate('/auth')
+    }
     setSubmitting(true)
     try {
-      await axios.post(`${API}/appointments`, { ...form, doctor: id, fee: doctor.fee }, authHeader())
+      await axios.post(
+        `${API}/appointments`,
+        { ...form, doctor: id, fee: doctor.fee },
+        { headers: { Authorization: `Bearer ${freshToken}` } }
+      )
       toast.success('Appointment booked successfully!')
       setShowBooking(false)
       navigate('/my-appointments')

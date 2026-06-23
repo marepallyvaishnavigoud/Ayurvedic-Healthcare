@@ -1,6 +1,6 @@
 import express from 'express'
 import OpenAI from 'openai'
-import protect from '../middleware/auth.js'
+import { protect } from '../middleware/auth.js'
 import HealthAnalysis from '../models/HealthAnalysis.js'
 import Medicine from '../models/Medicine.js'
 import Treatment from '../models/Treatment.js'

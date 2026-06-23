@@ -3,6 +3,9 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import axios from 'axios'
 import toast from 'react-hot-toast'
+import { GoogleLogin } from '@react-oauth/google'
+
+
 
 // ── Shared input style ──
 const inp = 'w-full border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-green-500 focus:ring-2 focus:ring-green-100 transition-all'
@@ -34,7 +37,7 @@ const AuthPage = () => {
   const [tab, setTab] = useState('login')
   const [form, setForm] = useState({ name: '', email: '', password: '' })
   const [showPassword, setShowPassword] = useState(false)
-  const { login, register, loading, API } = useAuth()
+  const { login, register, loginWithGoogle, loading, API } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
   const from = location.state?.from || '/'
@@ -63,6 +66,22 @@ const AuthPage = () => {
       toast.error(res.message)
     }
   }
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    try {
+      const token = credentialResponse?.credential
+      if (!token) return toast.error('Google sign-in failed. No token received.')
+
+      const res = await loginWithGoogle(token)
+      if (!res.success) return toast.error(res.message || 'Google login failed')
+
+      toast.success('Signed in with Google! 🌿')
+      navigate(from, { replace: true })
+    } catch (e) {
+      toast.error('Google sign-in failed')
+    }
+  }
+
 
   // Step 1 — send OTP
   const sendOtp = async (e) => {
@@ -283,6 +302,23 @@ const AuthPage = () => {
               <button type='submit' disabled={loading} className={btn}>
                 {loading ? '⏳ Please wait...' : tab === 'login' ? 'Sign In →' : 'Create Account →'}
               </button>
+
+              {/* Continue with Google */}
+              <div className='relative flex items-center justify-center'>
+                <span className='absolute inset-x-0 top-1/2 border-t border-gray-200' />
+                <span className='relative bg-white px-3 text-xs text-gray-400'>OR</span>
+              </div>
+
+              <div className='w-full'>
+                <GoogleLogin
+                  onSuccess={handleGoogleSuccess}
+                  onError={() => toast.error('Google sign-in failed')}
+                  useOneTap
+                />
+
+
+              </div>
+
 
               <p className='text-center text-sm text-gray-500'>
                 {tab === 'login' ? "Don't have an account? " : 'Already have an account? '}

@@ -83,7 +83,9 @@ function AnimatedCard({ med, index }) {
     navigate('/cart')
   }
 
-  const discount = Math.round((1 - med.price / med.original) * 100)
+  const discount = med.original && med.original > med.price
+    ? Math.round((1 - med.price / med.original) * 100)
+    : 0
 
   return (
     <div ref={ref} className={`bg-white rounded-2xl overflow-hidden shadow-md card-hover transition-all duration-700 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`} style={{ transitionDelay: `${(index % 4) * 100}ms` }}>
