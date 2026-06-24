@@ -9,10 +9,54 @@ const stats = [
 ]
 
 const features = [
-  { icon: '\uD83C\uDF3F', title: 'Pure & Natural', desc: 'All medicines sourced from certified organic farms with zero chemicals.' },
-  { icon: '\uD83D\uDC68\u200D\u2695\uFE0F', title: 'Expert Doctors', desc: 'Consult with certified Ayurvedic practitioners with 10+ years experience.' },
-  { icon: '\uD83E\uDDD8', title: 'Holistic Healing', desc: 'Mind, body and soul wellness through ancient Ayurvedic science.' },
-  { icon: '\uD83D\uDE9A', title: 'Fast Delivery', desc: 'Medicines delivered to your doorstep within 2-3 business days.' },
+  {
+    img: 'https://images.unsplash.com/photo-1471193945509-9ad0617afabf?w=600&h=400&fit=crop&q=80',
+    tag: 'Organic',
+    tagColor: 'bg-green-100 text-green-700',
+    iconBg: 'bg-green-50',
+    iconColor: 'text-green-600',
+    title: 'Pure & Natural',
+    desc: 'All medicines sourced from certified organic farms with zero chemicals.',
+    stat: '100% Organic Sources',
+    statColor: 'text-green-600',
+    border: 'hover:border-green-200',
+  },
+  {
+    img: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=600&h=400&fit=crop&q=80',
+    tag: 'Verified',
+    tagColor: 'bg-blue-100 text-blue-700',
+    iconBg: 'bg-blue-50',
+    iconColor: 'text-blue-600',
+    title: 'Expert Doctors',
+    desc: 'Consult with certified Ayurvedic practitioners with 10+ years experience.',
+    stat: '50+ Certified Doctors',
+    statColor: 'text-blue-600',
+    border: 'hover:border-blue-200',
+  },
+  {
+    img: 'https://images.unsplash.com/photo-1600334089648-b0d9d3028eb2?w=600&h=400&fit=crop&q=80',
+    tag: 'Wellness',
+    tagColor: 'bg-teal-100 text-teal-700',
+    iconBg: 'bg-teal-50',
+    iconColor: 'text-teal-600',
+    title: 'Holistic Healing',
+    desc: 'Mind, body and soul wellness through ancient Ayurvedic science.',
+    stat: '10,000+ Treatments Done',
+    statColor: 'text-teal-600',
+    border: 'hover:border-teal-200',
+  },
+  {
+    img: 'https://images.unsplash.com/photo-1586015555751-63bb77f4322a?w=600&h=400&fit=crop&q=80',
+    tag: 'Pan India',
+    tagColor: 'bg-orange-100 text-orange-700',
+    iconBg: 'bg-orange-50',
+    iconColor: 'text-orange-600',
+    title: 'Fast Delivery',
+    desc: 'Medicines delivered to your doorstep within 2–3 business days.',
+    stat: 'Delivery Across India',
+    statColor: 'text-orange-600',
+    border: 'hover:border-orange-200',
+  },
 ]
 
 const testimonials = [
@@ -202,16 +246,46 @@ const Home = () => {
       {/* FEATURES */}
       <section ref={featRef} className='py-24 bg-white'>
         <div className='max-w-6xl mx-auto px-6'>
-          <div className='text-center mb-16'>
+          <div className='text-center mb-14'>
             <span className='text-green-600 font-semibold text-sm tracking-widest uppercase'>Why Choose Us</span>
             <h2 className='text-4xl font-bold text-green-900 mt-3'>Your Wellness, Our Priority</h2>
+            <p className='text-gray-500 mt-3 text-base max-w-xl mx-auto'>Trusted by thousands of patients across India for authentic, effective Ayurvedic care.</p>
           </div>
-          <div className='grid md:grid-cols-4 gap-8'>
+          <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6'>
             {features.map((f, i) => (
-              <div key={i} className={`text-center p-8 rounded-2xl bg-gradient-to-b from-green-50 to-white border border-green-100 card-hover transition-all duration-700 ${featVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`} style={{ transitionDelay: `${i * 100}ms` }}>
-                <div className='text-5xl mb-5'>{f.icon}</div>
-                <h3 className='text-xl font-bold text-green-900 mb-3'>{f.title}</h3>
-                <p className='text-gray-500 text-sm leading-relaxed'>{f.desc}</p>
+              <div
+                key={i}
+                className={`group bg-white rounded-2xl overflow-hidden border border-gray-100 ${f.border} shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 flex flex-col ${
+                  featVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+                }`}
+                style={{ transitionDelay: `${i * 100}ms` }}
+              >
+                {/* Image */}
+                <div className='relative h-44 overflow-hidden'>
+                  <img
+                    src={f.img}
+                    alt={f.title}
+                    className='w-full h-full object-cover group-hover:scale-105 transition-transform duration-500'
+                  />
+                  <div className='absolute inset-0 bg-gradient-to-t from-black/30 to-transparent' />
+                  <span className={`absolute top-3 left-3 text-xs font-semibold px-2.5 py-1 rounded-full ${f.tagColor}`}>
+                    {f.tag}
+                  </span>
+                </div>
+
+                {/* Content */}
+                <div className='p-5 flex flex-col flex-1'>
+                  <h3 className='text-base font-bold text-gray-900 mb-1.5'>{f.title}</h3>
+                  <p className='text-gray-500 text-sm leading-relaxed flex-1'>{f.desc}</p>
+
+                  {/* Stat */}
+                  <div className={`mt-4 pt-4 border-t border-gray-100 flex items-center gap-2 text-xs font-semibold ${f.statColor}`}>
+                    <svg className='w-3.5 h-3.5 flex-shrink-0' fill='currentColor' viewBox='0 0 20 20'>
+                      <path fillRule='evenodd' d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z' clipRule='evenodd' />
+                    </svg>
+                    {f.stat}
+                  </div>
+                </div>
               </div>
             ))}
           </div>
