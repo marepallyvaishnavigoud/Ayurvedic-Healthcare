@@ -94,62 +94,66 @@ router.post('/reset-password', async (req, res) => {
   }
 })
 
-// Shared helper: upsert a Google user and return JWT response
-const handleGoogleUser = async (res, { googleId, email, name, picture }) => {
-  if (!googleId || !email)
-    return res.status(401).json({ message: 'Google account missing required fields' })
-
-  let user = await User.findOne({ googleId })
-  if (!user) {
-    user = await User.create({ name, email, googleId, profilePicture: picture, authProvider: 'google' })
-  } else {
-    user.profilePicture = picture || user.profilePicture
-    user.name = user.name || name
-    await user.save()
-  }
-
-  res.json({
-    _id: user._id,
-    name: user.name,
-    email: user.email,
-    profilePicture: user.profilePicture,
-    authProvider: user.authProvider,
-    token: generateToken(user._id),
-  })
-}
-
-// POST /api/auth/google
-// Body: { token } — Google ID token (credential) from GoogleLogin component
+// POST /api/auth/google  (handles both ID token and access-token profile flows)
 router.post('/google', async (req, res) => {
   try {
-    const { token } = req.body
-    if (!token) return res.status(400).json({ message: 'Google token is required' })
+    let googleId, email, name, picture
 
-    const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
-    const ticket = await client.verifyIdToken({
-      idToken: token,
-      audience: process.env.GOOGLE_CLIENT_ID,
+    if (req.body.token) {
+      // ── ID token flow (credential from GoogleLogin component) ──
+      const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
+      const ticket = await client.verifyIdToken({
+        idToken: req.body.token,
+        audience: process.env.GOOGLE_CLIENT_ID,
+      })
+      const payload = ticket.getPayload()
+      if (!payload) return res.status(401).json({ message: 'Invalid Google token' });
+      ({ sub: googleId, email, name = '', picture = '' } = payload)
+    } else {
+      // ── Access token flow (profile fetched client-side via userinfo API) ──
+      ;({ googleId, email, name = '', picture = '' } = req.body)
+    }
+
+    if (!googleId || !email)
+      return res.status(401).json({ message: 'Google account missing required fields' })
+
+    // 1. Try to find by googleId (returning Google user)
+    let user = await User.findOne({ googleId })
+
+    if (!user) {
+      // 2. Try to find by email (existing local/password account with the same email)
+      user = await User.findOne({ email })
+
+      if (user) {
+        // Existing local account — link it to this Google identity
+        user.googleId = googleId
+        user.profilePicture = user.profilePicture || picture
+        user.authProvider = user.authProvider === 'local' ? 'local' : 'google'
+        await user.save()
+      } else {
+        // 3. Brand-new user — create the record
+        user = await User.create({
+          name,
+          email,
+          googleId,
+          profilePicture: picture,
+          authProvider: 'google',
+        })
+      }
+    } else {
+      // Returning Google user — keep profile picture fresh
+      user.profilePicture = picture || user.profilePicture
+      await user.save()
+    }
+
+    res.json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      profilePicture: user.profilePicture,
+      authProvider: user.authProvider,
+      token: generateToken(user._id),
     })
-    const payload = ticket.getPayload()
-    if (!payload) return res.status(401).json({ message: 'Invalid Google token' })
-
-    await handleGoogleUser(res, {
-      googleId: payload.sub,
-      email: payload.email,
-      name: payload.name || '',
-      picture: payload.picture || '',
-    })
-  } catch (err) {
-    res.status(401).json({ message: err?.message || 'Google authentication failed' })
-  }
-})
-
-// POST /api/auth/google-profile
-// Body: { googleId, email, name, picture } — profile from Google userinfo API (access token flow)
-router.post('/google-profile', async (req, res) => {
-  try {
-    const { googleId, email, name, picture } = req.body
-    await handleGoogleUser(res, { googleId, email, name: name || '', picture: picture || '' })
   } catch (err) {
     res.status(401).json({ message: err?.message || 'Google authentication failed' })
   }
