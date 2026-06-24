@@ -75,10 +75,18 @@ export const AuthProvider = ({ children }) => {
     }
   }
 
-  const loginWithGoogle = async (token) => {
+  const loginWithGoogle = async (profile) => {
     setLoading(true)
     try {
-      const { data } = await axios.post(`${API}/auth/google`, { token })
+      // profile can be either:
+      //   { sub, email, name, picture } from Google userinfo API (access token flow)
+      //   or a raw id_token string (credential flow — kept for fallback)
+      const isToken = typeof profile === 'string'
+      const endpoint = isToken ? `${API}/auth/google` : `${API}/auth/google-profile`
+      const body = isToken
+        ? { token: profile }
+        : { googleId: profile.sub, email: profile.email, name: profile.name, picture: profile.picture }
+      const { data } = await axios.post(endpoint, body)
       saveUser(data)
       return { success: true }
     } catch (err) {
