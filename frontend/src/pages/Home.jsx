@@ -22,7 +22,7 @@ const features = [
     border: 'hover:border-green-200',
   },
   {
-    img: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=600&h=400&fit=crop&q=80',
+    img: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=600&h=400&fit=crop&crop=top&q=80',
     tag: 'Verified',
     tagColor: 'bg-blue-100 text-blue-700',
     iconBg: 'bg-blue-50',
@@ -32,9 +32,10 @@ const features = [
     stat: '50+ Certified Doctors',
     statColor: 'text-blue-600',
     border: 'hover:border-blue-200',
+    imgPosition: 'object-top',
   },
   {
-    img: 'https://images.unsplash.com/photo-1600334089648-b0d9d3028eb2?w=600&h=400&fit=crop&q=80',
+    img: 'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=600&h=400&fit=crop&q=80',
     tag: 'Wellness',
     tagColor: 'bg-teal-100 text-teal-700',
     iconBg: 'bg-teal-50',
@@ -265,7 +266,7 @@ const Home = () => {
                   <img
                     src={f.img}
                     alt={f.title}
-                    className='w-full h-full object-cover group-hover:scale-105 transition-transform duration-500'
+                    className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ${f.imgPosition || 'object-center'}`}
                   />
                   <div className='absolute inset-0 bg-gradient-to-t from-black/30 to-transparent' />
                   <span className={`absolute top-3 left-3 text-xs font-semibold px-2.5 py-1 rounded-full ${f.tagColor}`}>
