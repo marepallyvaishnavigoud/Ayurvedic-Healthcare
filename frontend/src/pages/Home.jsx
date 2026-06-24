@@ -219,23 +219,85 @@ const Home = () => {
       </section>
 
       {/* QUICK LINKS */}
-      <section className='py-20 bg-gradient-to-br from-green-900 via-green-800 to-emerald-900 relative overflow-hidden'>
-        <div className='absolute inset-0 opacity-10' style={{ backgroundImage: "url('https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=1600&q=40')", backgroundSize: 'cover' }} />
-        <div className='relative max-w-6xl mx-auto px-6 text-center'>
-          <h2 className='text-4xl font-bold text-white mb-4'>Begin Your Healing Journey</h2>
-          <p className='text-green-200 mb-12 text-lg'>Explore our comprehensive Ayurvedic services</p>
-          <div className='grid md:grid-cols-4 gap-6'>
+      <section className='py-20 bg-gray-50'>
+        <div className='max-w-6xl mx-auto px-6'>
+          <div className='text-center mb-12'>
+            <span className='text-green-600 font-semibold text-sm tracking-widest uppercase'>Our Services</span>
+            <h2 className='text-4xl font-bold text-green-900 mt-3'>Begin Your Healing Journey</h2>
+            <p className='text-gray-500 mt-3 text-lg'>Explore our comprehensive Ayurvedic services</p>
+          </div>
+          <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6'>
             {[
-              { to: '/doctors', icon: '\uD83D\uDC68\u200D\u2695\uFE0F', title: 'Find Doctors', desc: 'Book consultations with certified Ayurvedic experts', color: 'from-green-500/30 to-green-600/30' },
-              { to: '/medicines', icon: '\uD83C\uDF3F', title: 'Shop Medicines', desc: 'Browse 200+ authentic herbal formulations', color: 'from-amber-500/30 to-amber-600/30' },
-              { to: '/treatments', icon: '\uD83E\uDDD8', title: 'Book Treatments', desc: 'Experience traditional Ayurvedic therapies', color: 'from-teal-500/30 to-teal-600/30' },
-              { to: '/ai-health-analysis', icon: '\uD83E\uDDE0', title: 'AI Health Analysis', desc: 'Get personalized Ayurvedic insights powered by AI', color: 'from-purple-500/30 to-indigo-600/30' },
+              {
+                to: '/doctors',
+                img: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=600&h=400&fit=crop&q=80',
+                badge: 'Consultation',
+                badgeColor: 'bg-green-100 text-green-700',
+                title: 'Find Doctors',
+                desc: 'Book consultations with certified Ayurvedic experts',
+                cta: 'Book Now',
+                accent: 'group-hover:text-green-600',
+              },
+              {
+                to: '/medicines',
+                img: 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=600&h=400&fit=crop&q=80',
+                badge: '200+ Products',
+                badgeColor: 'bg-amber-100 text-amber-700',
+                title: 'Shop Medicines',
+                desc: 'Browse authentic herbal formulations & supplements',
+                cta: 'Shop Now',
+                accent: 'group-hover:text-amber-600',
+              },
+              {
+                to: '/treatments',
+                img: 'https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=600&h=400&fit=crop&q=80',
+                badge: 'Therapies',
+                badgeColor: 'bg-teal-100 text-teal-700',
+                title: 'Book Treatments',
+                desc: 'Experience traditional Panchakarma & Ayurvedic therapies',
+                cta: 'Explore',
+                accent: 'group-hover:text-teal-600',
+              },
+              {
+                to: '/ai-health-analysis',
+                img: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=600&h=400&fit=crop&q=80',
+                badge: 'AI Powered',
+                badgeColor: 'bg-purple-100 text-purple-700',
+                title: 'AI Health Analysis',
+                desc: 'Get personalised Ayurvedic insights powered by AI',
+                cta: 'Try Free',
+                accent: 'group-hover:text-purple-600',
+              },
             ].map((item, i) => (
-              <Link key={i} to={item.to} className={`glass bg-gradient-to-br ${item.color} rounded-2xl p-8 text-left hover:scale-105 transition-all group`}>
-                <div className='text-5xl mb-4'>{item.icon}</div>
-                <h3 className='text-2xl font-bold text-white mb-2'>{item.title}</h3>
-                <p className='text-white/70 text-sm mb-4'>{item.desc}</p>
-                <span className='text-green-300 text-sm font-semibold'>Explore &#8594;</span>
+              <Link
+                key={i}
+                to={item.to}
+                className='group bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col'
+              >
+                {/* Image */}
+                <div className='relative h-48 overflow-hidden'>
+                  <img
+                    src={item.img}
+                    alt={item.title}
+                    className='w-full h-full object-cover group-hover:scale-105 transition-transform duration-500'
+                  />
+                  <span className={`absolute top-3 left-3 text-xs font-semibold px-2.5 py-1 rounded-full ${item.badgeColor}`}>
+                    {item.badge}
+                  </span>
+                </div>
+                {/* Content */}
+                <div className='p-5 flex flex-col flex-1'>
+                  <h3 className={`text-lg font-bold text-gray-900 mb-1.5 transition-colors duration-200 ${item.accent}`}>
+                    {item.title}
+                  </h3>
+                  <p className='text-gray-500 text-sm leading-relaxed flex-1'>{item.desc}</p>
+                  <div className='mt-4 flex items-center gap-1 text-sm font-semibold text-green-700'>
+                    {item.cta}
+                    <svg className='w-4 h-4 group-hover:translate-x-1 transition-transform duration-200' fill='none' viewBox='0 0 24 24' stroke='currentColor' strokeWidth={2.5}>
+                      <path strokeLinecap='round' strokeLinejoin='round' d='M17 8l4 4m0 0l-4 4m4-4H3' />
+                    </svg>
+                  </div>
+                </div>
               </Link>
             ))}
           </div>
